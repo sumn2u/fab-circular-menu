@@ -237,40 +237,41 @@ class FabCircularMenuState extends State<FabCircularMenu>
   }
 
   void _calculateProps() {
-    // Get system padding (from MediaQuery) – not used for translation anymore
-    final padding = MediaQuery.of(context).padding;
-  
     _ringColor = widget.ringColor ?? Theme.of(context).colorScheme.secondary;
     _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
     _fabOpenColor = widget.fabOpenColor ?? _fabColor;
     _fabCloseColor = widget.fabCloseColor ?? _fabColor;
-    _fabIconBorder = widget.fabIconBorder ?? const CircleBorder();
-  
+    _fabIconBorder = widget.fabIconBorder ?? CircleBorder();
     _screenWidth = MediaQuery.of(context).size.width;
     _screenHeight = MediaQuery.of(context).size.height;
-    _ringDiameter = widget.ringDiameter ?? min(_screenWidth, _screenHeight) * 1.25;
+    _ringDiameter =
+        widget.ringDiameter ?? min(_screenWidth, _screenHeight) * 1.25;
     _ringWidth = widget.ringWidth ?? _ringDiameter! * 0.3;
-  
-    // Directions for menu item placement (unchanged)
-    _directionX = widget.alignment.x == 0 ? 1 : widget.alignment.x.sign;
-    _directionY = widget.alignment.y == 0 ? 1 : widget.alignment.y.sign;
-  
-    // ✅ Correct translation to center ring on FAB
-    _translationX = ((_ringDiameter! - widget.fabSize) / 2) * widget.alignment.x;
-    _translationY = ((_ringDiameter! - widget.fabSize) / 2) * widget.alignment.y;
-  
-    // ❌ Remove all padding adjustments – they break alignment
-  
+    _marginH = (widget.fabMargin.right + widget.fabMargin.left) / 2;
+    _marginV = (widget.fabMargin.top + widget.fabMargin.bottom) / 2;
+    _directionX = widget.alignment.x == 0 ? 1 : 1 * widget.alignment.x.sign;
+    _directionY = widget.alignment.y == 0 ? 1 : 1 * widget.alignment.y.sign;
+    _translationX =
+        ((_screenWidth - widget.fabSize) / 2 - _marginH) * widget.alignment.x;
+    _translationY =
+        ((_screenHeight - widget.fabSize) / 2 - _marginV) * widget.alignment.y;
+
     if (_colorAnimation == null || !kReleaseMode) {
       _colorCurve = CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.0, 0.4, curve: widget.animationCurve),
-      );
+          parent: _animationController,
+          curve: Interval(
+            0.0,
+            0.4,
+            curve: widget.animationCurve,
+          ));
       _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor)
           .animate(_colorCurve as Animation<double>)
-            ..addListener(() => setState(() {}));
+            ..addListener(() {
+              setState(() {});
+            });
     }
   }
+
 
   void open() {
     _isAnimating = true;
